@@ -1,7 +1,30 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import Input from "./Input.js";
+import Task from "./Task.js";
 
 function App() {
-  
+  const [inputValue, setInputValue] = useState("");
+  const [todoList, setTodoList] = useState(
+    JSON.parse(localStorage.getItem("todoList")) ?? []
+  );
+  const myRef = useRef(null);
+  useEffect(() => {
+    localStorage.setItem("todoList", JSON.stringify(todoList));
+  }, [todoList]);
+  const handleAdd = () => {
+    setTodoList([...todoList, inputValue]);
+    console.log(myRef.current.value = "");
+  };
+
+  const handleOnChange = (e) => {
+    setInputValue(e.target.value);
+  };
+  const handleDelete = (index) => {
+    const newTodoList = todoList.filter((value, id) => id !== index);
+    setTodoList(newTodoList);
+    console.log(newTodoList);
+  };
+
   return (
     <>
       <div className="w-screen h-screen flex justify-center items-center bg-gradient-to-r from-[#ffc482] to-[#ff8e35]">
@@ -9,32 +32,21 @@ function App() {
           <h1 className="text-4xl font-semibold text-[#333] text-center mb-4">
             Todo App
           </h1>
-          <input
-            type="text"
-            className="border-[1px] border-[#666] rounded-lg w-full h-12 py-2 px-4 text-lg mb-4 outline-[#ff8e35]"
-            placeholder="Task name"
-          ></input>
+          <Input functionOnChange={(e) => handleOnChange(e)} myRef={myRef}></Input>
           <button
             className="text-lg p-2 w-full bg-orange-400 rounded-lg text-white font-semibold"
+            onClick={handleAdd}
           >
             Add task
           </button>
           <div className="flex flex-col flex-1 justify-start mt-4 gap-4">
-            
-              <div className="flex flex-row items-center gap-4" >
-                <div className="text-lg py-2 px-4 bg-orange-400 text-white rounded-lg">
-                  1
-                </div>
-                <p className="text-lg flex-1">Nau com</p>
-                <button
-                  className="text-lg text-[#da1414]"
-                >
-                  DELETE
-                </button>
-              </div>
-            
+            {todoList.map((task, index) => (
+              <Task key={index} info={task} index={index} functionDelete={()=> handleDelete(index)}></Task>
+            ))}
           </div>
-          <p className="text-end text-lg">You have 1 tasks</p>
+          <p className="text-end text-lg">
+            You have {todoList.length} {todoList.length > 1 ? "tasks" : "task"}
+          </p>
         </div>
       </div>
     </>
